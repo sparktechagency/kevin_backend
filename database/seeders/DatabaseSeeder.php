@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Mentor',
                 'email' => 'mentor@gmail.com',
                 // 'password' => Hash::make('12345678'),
-                'employee_pin' => '123456',
+                'employee_pin' => '123123',
                 'contact_number' => '01710000005',
                 'avatar' => 'default/profile.png',
                 'role' => 'MENTOR',

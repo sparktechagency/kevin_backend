@@ -19,7 +19,7 @@ class LoginService
             return $this->errorResponse('Invalid Password.', 401);
         }
          if (!$user->email_verified_at) {
-            return $this->errorResponse('Your email is not verified. Please verify your email to login.', 403);
+            return $this->errorResponse('Your email is not verified. Please verify your email to login.');
         }
         $token = $user->createToken('auth_token')->plainTextToken;
         return $this->successResponse([

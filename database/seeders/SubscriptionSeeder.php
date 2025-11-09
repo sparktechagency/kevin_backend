@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Plan;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,63 +14,60 @@ class SubscriptionSeeder extends Seeder
      */
    public function run(): void
     {
-        DB::table('subscriptions')->insert([
+         $plans = [
             [
-                'name' => 'Dream Starter',
-                'tagline' => 'Begin your journey',
+                'name' => 'Starter',
                 'price' => 0.00,
-                'duration' => 'monthly',
-                'has_trial' => false,
-                'trial_days' => null,
-                'features' => json_encode([
+                'interval' => 'month',
+                'features' => [
                     '3 active dreams',
                     'Basic progress tracking',
                     'Monthly check-ins',
                     'Mobile app access',
                     'Community forum',
-                    'No AI insights',
-                    'Limited analytics',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
+                    // 'No AI insights',
+                    // 'Limited analytics'
+                ]
             ],
             [
-                'name' => 'Dream Builder',
-                'tagline' => 'Committed to success',
+                'name' => 'Builder',
                 'price' => 9.99,
-                'duration' => 'monthly',
-                'has_trial' => true,
-                'trial_days' => 7,
-                'features' => json_encode([
+                'interval' => 'month',
+                'features' => [
                     'Everything in Starter',
                     'Unlimited dreams',
                     'AI-powered insights',
                     'Weekly check-ins',
                     'Progress analytics',
                     'All 12 dream categories',
-                    'Habit tracking',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
+                    'Habit tracking'
+                ]
             ],
             [
-                'name' => 'Dream Master',
-                'tagline' => 'Accelerate your success',
+                'name' => 'Master',
                 'price' => 19.99,
-                'duration' => 'monthly',
-                'has_trial' => true,
-                'trial_days' => 7,
-                'features' => json_encode([
+                'interval' => 'month',
+                'features' => [
                     'Everything in Builder',
                     'Personal AI coach',
                     'Voice journaling',
                     'Advanced analytics',
                     'Accountability partners',
-                    'Early feature access',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+                    'Early feature access'
+                ]
+            ]
+        ];
+
+        foreach ($plans as $plan) {
+            // In a real app, you'd create these in Stripe first and get the IDs
+            Plan::create([
+                'name' => $plan['name'],
+                'price' => $plan['price'],
+                'interval' => $plan['interval'],
+                'features' => $plan['features'],
+                'stripe_price_id' => 'price_' . strtolower($plan['name']), // Replace with actual Stripe price ID
+                'stripe_product_id' => 'prod_' . strtolower($plan['name']) // Replace with actual Stripe product ID
+            ]);
+        }
     }
 }

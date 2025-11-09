@@ -27,6 +27,9 @@ class User extends Authenticatable
         'avatar',
         'is_banned',
         'role',
+        'ends_at',
+        'trial_ends_at',
+        'is_notification'
     ];
 
     /**
@@ -50,5 +53,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->subscriptions()
+            ->whereIn('status', ['active', 'trial'])
+            ->where(function ($query) {
+                $query->where('trial_ends_at', '>', now())
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->latest()
+            ->first();
     }
 }

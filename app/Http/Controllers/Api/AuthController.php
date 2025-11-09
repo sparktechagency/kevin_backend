@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CreatePasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResendOtpRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
+use App\Http\Requests\Auth\EmployeeLoginRequest;
 use App\Service\Auth\CheckTokenService;
+use App\Service\Auth\CreatePasswordService;
+use App\Service\Auth\EmployeeLoginService;
 use App\Service\Auth\LoginService;
 use App\Service\Auth\LogoutService;
 use App\Service\Auth\ProfileService;
@@ -31,6 +35,8 @@ class AuthController extends Controller
     protected $updateProfileService;
     protected $resetPasswordService;
     protected $checkTokenService;
+    protected $employeeLoginService;
+    protected $createPasswordService;
    public function __construct(
         RegisterService $registerService,
         LoginService $loginService,
@@ -41,6 +47,8 @@ class AuthController extends Controller
         ResetPasswordService $resetPasswordService,
         LogoutService $logoutService,
         CheckTokenService $checkTokenService,
+        EmployeeLoginService $employeeLoginService,
+        CreatePasswordService $createPasswordService,
     )
     {
         $this->registerService = $registerService;
@@ -52,6 +60,8 @@ class AuthController extends Controller
         $this->resetPasswordService = $resetPasswordService;
         $this->logoutService = $logoutService;
         $this->checkTokenService = $checkTokenService;
+        $this->employeeLoginService = $employeeLoginService;
+        $this->createPasswordService = $createPasswordService;
     }
     public function register(RegisterRequest $register)
     {
@@ -81,6 +91,12 @@ class AuthController extends Controller
             return $this->loginService->login($data);
         });
     }
+    public function employeeLogin(EmployeeLoginRequest $request)
+    {
+        return $this->execute(function() use ($request){
+            return $this->employeeLoginService->employeeLogin($request);
+        });
+    }
     public function getProfile()
     {
         return $this->execute(function(){
@@ -99,6 +115,13 @@ class AuthController extends Controller
         return $this->execute(function() use ($resetPasswordRequest){
             $data = $resetPasswordRequest->validated();
             return $this->resetPasswordService->resetPassword($data);
+        });
+    }
+     public function createPassword(CreatePasswordRequest $createPasswordRequest)
+    {
+        return $this->execute(function() use ($createPasswordRequest){
+            $data = $createPasswordRequest->validated();
+            return $this->createPasswordService->createPassword($data);
         });
     }
     public function checkToken(Request $request)
