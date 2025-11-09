@@ -10,7 +10,9 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "predis/predis": "^3.2"
+        "nesbot/carbon": "^3.10",
+        "predis/predis": "^3.2",
+        "stripe/stripe-php": "^18.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

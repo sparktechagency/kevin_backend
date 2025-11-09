@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('tagline')->nullable();
-            $table->decimal('price', 8, 2)->default(0.00);
-            $table->string('duration')->default('monthly');
-            $table->boolean('has_trial')->default(false);
-            $table->integer('trial_days')->nullable();
-            $table->json('features')->nullable();
+            $table->foreignId('user_id');
+            $table->foreignId('plan_id');
+            $table->string('stripe_subscription_id')->unique();
+            $table->string('status');
+            $table->timestamp('trial_ends_at')->nullable();
+            $table->timestamp('ends_at')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->timestamps();
         });
     }

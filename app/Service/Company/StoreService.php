@@ -2,8 +2,10 @@
 
 namespace App\Service\Company;
 
+use App\Mail\WelcomeEmail;
 use App\Models\Company;
 use App\Traits\ResponseHelper;
+use Illuminate\Support\Facades\Mail;
 
 class StoreService
 {
@@ -16,6 +18,9 @@ class StoreService
             $data['company_logo'] = 'storage/' . $logoPath;
         }
         $company = Company::create($data);
+        if (!empty($data['send_welcome_email']) && $data['send_welcome_email'] == true) {
+            Mail::to($company->company_email)->queue(new WelcomeEmail($company));
+        }
         return $this->successResponse($company, 'Company created successfully.');
     }
 }

@@ -25,6 +25,6 @@ class ResendOtpService
             'name' => $user->name,
         ];
         Mail::to($user->email)->queue(new OtpMail($otpInfo));
-        return $this->successResponse([], 'OTP has been resent to your email.');
+        return $this->successResponse($otpInfo, 'OTP has been resent to your email.');
     }
 }
