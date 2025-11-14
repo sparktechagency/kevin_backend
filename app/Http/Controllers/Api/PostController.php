@@ -10,6 +10,7 @@ use App\Service\Post\IndexService;
 use App\Service\Post\LikeService;
 use App\Service\Post\ReplyService;
 use App\Service\Post\SearchTopicesService;
+use App\Service\Post\SinglePostService;
 use App\Service\Post\StoreService;
 use App\Service\Post\WeeklyHghlight;
 use App\Service\Post\WeeklyHghlightService;
@@ -25,6 +26,7 @@ class PostController extends Controller
     protected $replyService;
     protected $searchTopicesService;
     protected $weeklyHighlitService;
+    protected $singlePostService;
     public function __construct(
         StoreService $storeService,
         IndexService $indexService,
@@ -33,6 +35,7 @@ class PostController extends Controller
         ReplyService $replyService,
         SearchTopicesService $searchTopicesService,
         WeeklyHghlightService $weeklyHghlightService,
+        SinglePostService $singlePostService,
     )
     {
         $this->storeService = $storeService;
@@ -42,6 +45,7 @@ class PostController extends Controller
         $this->replyService = $replyService;
         $this->searchTopicesService = $searchTopicesService;
         $this->weeklyHighlitService = $weeklyHghlightService;
+        $this->singlePostService = $singlePostService;
     }
     public function index(Request $request)
     {
@@ -86,6 +90,12 @@ class PostController extends Controller
     {
         return $this->execute(function()use($request){
             return $this->weeklyHighlitService->weeklyHghlight($request);
+        });
+    }
+    public function singlePost($post_id)
+    {
+        return $this->execute(function()use($post_id){
+            return $this->singlePostService->singlePost($post_id);
         });
     }
 }

@@ -20,9 +20,7 @@ class VoiceNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'voice' => 'nullable', // 50MB limit
+            'voice' => 'required', // 50MB limit
             // 'voice' => 'nullable|file|mimes:mp3,m4a|mimetypes:audio/mpeg,audio/mp4,audio/mp4a-latm,audio/aac|max:51200', // 50MB limit
         ];
     }

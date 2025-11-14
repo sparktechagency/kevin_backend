@@ -19,7 +19,7 @@ class CheckoutService
         }
         $existing = Subscription::where('user_id', $user->id)
             ->where('plan_id', $plan->id)
-            ->where('status', 'active')
+            // ->where('status', 'active')
             ->first();
 
         if ($existing) {
@@ -52,6 +52,7 @@ class CheckoutService
         ]);
         if($subscription->trial_ends_at){
             $user->trial_ends_at = now()->addDays(7);
+            $user->is_subscribed = $plan->name;
             $user->save();
         }
         return $this->successResponse( $subscription,'Subscription created. Awaiting payment confirmation.');

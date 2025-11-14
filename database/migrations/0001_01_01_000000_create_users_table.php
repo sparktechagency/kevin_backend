@@ -22,10 +22,10 @@ return new class extends Migration
             $table->string('avatar')->default('default/profile.png');
             $table->boolean('is_banned')->default(false)->index();
             $table->boolean('is_notification')->default(true)->index();
-            $table->enum('role', ['EMPLOYEE','MANAGER','USER','ADMIN','MENTOR'])->default('USER')->index();
-
+            $table->string('is_subscribed')->nullable()->index();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
+            $table->enum('role', ['EMPLOYEE','MANAGER','USER','ADMIN','MENTOR'])->default('USER')->index();
             $table->rememberToken();
             $table->timestamps();
         });

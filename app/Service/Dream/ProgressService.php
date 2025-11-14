@@ -88,6 +88,7 @@ class ProgressService
                 'description' => $dream->description,
                 'category' => $dream->category->name ?? null,
                 'user' => $dream->user,
+                'status' => $dream->status,
                 'progress' => $progress,
                 'streak_days' => $streak,
                 'remaining_status' => $remainingStatus,

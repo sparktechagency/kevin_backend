@@ -29,7 +29,8 @@ class User extends Authenticatable
         'role',
         'ends_at',
         'trial_ends_at',
-        'is_notification'
+        'is_notification',
+        'is_subscribed'
     ];
 
     /**

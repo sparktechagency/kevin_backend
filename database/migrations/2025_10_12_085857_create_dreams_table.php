@@ -24,7 +24,7 @@ return new class extends Migration
             $table->time('to')->nullable();
             $table->integer('per_week')->nullable();
             $table->integer('per_month')->nullable();
-            $table->string('status')->nullable();
+            $table->string('status')->default('Pending');
             $table->timestamps();
         });
     }
