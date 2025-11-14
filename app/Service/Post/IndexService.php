@@ -27,22 +27,15 @@ class IndexService
             ])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
-
         $posts->getCollection()->transform(function ($post) use ($user) {
-            // Decode photos
             $post->photos = $post->photos ? json_decode($post->photos) : [];
-
-            // Check if the auth user reacted
             $userLike = $post->likes()
                 ->where('user_id', $user->id)
                 ->first();
-
-            $post->user_reacted = $userLike ? true : false;  // true or false
-            $post->user_reaction_type = $userLike?->type ?? null; // like/love/fire or null
-
+            $post->user_reacted = $userLike ? true : false;
+            $post->user_reaction_type = $userLike?->type ?? null;
             return $post;
         });
-
         return $this->successResponse($posts, 'Posts retrieved successfully.');
     }
 

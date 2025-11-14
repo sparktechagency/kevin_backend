@@ -130,10 +130,10 @@ class AuthController extends Controller
             return $this->checkTokenService->checkToken($request);
         });
     }
-    // public function logout()
-    // {
-    //     return $this->execute(function(){
-    //         return $this->logoutService->logout();
-    //     });
-    // }
+    public function logout()
+    {
+        return $this->execute(function(){
+            return $this->logoutService->logout();
+        });
+    }
 }

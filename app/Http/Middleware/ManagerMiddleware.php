@@ -15,7 +15,7 @@ class ManagerMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && in_array(auth()->user()->role, ['USER','MANAGER','EMPLOYEE','MENTOR'])) {
+        if (auth()->check() && in_array(auth()->user()->role, ['MANAGER','ADMIN'])) {
             return $next($request);
         }
         return response()->json(['message' => 'Access Denied.'], 403);

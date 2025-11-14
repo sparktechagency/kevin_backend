@@ -39,5 +39,7 @@ return [
         'secret' => env('STRIPE_SECRET'),
         'currency' => env('STRIPE_CURRENCY', 'usd'),
     ],
-
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+    ],
 ];
