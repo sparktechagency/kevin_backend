@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_banned')->default(false)->index();
             $table->boolean('is_notification')->default(true)->index();
             $table->string('is_subscribed')->nullable()->index();
+            $table->string('fcm_token')->nullable();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->enum('role', ['EMPLOYEE','MANAGER','USER','ADMIN','MENTOR'])->default('USER')->index();

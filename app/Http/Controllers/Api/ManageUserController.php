@@ -56,7 +56,7 @@ class ManageUserController extends Controller
     public function destroy($id)
     {
         return $this->execute(function() use ($id) {
-            return $this->deleteService->delete($id);
+            return $this->deleteService->destroy($id);
         });
     }
 

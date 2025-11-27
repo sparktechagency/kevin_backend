@@ -11,7 +11,7 @@ class PlanService
   public function plans()
     {
         $user = auth()->user(); // Authenticated user
-        $plans = Plan::where('is_active', true)->get();
+        $plans = Plan::get();
         // Get user's current subscription (active or trial)
         $userSubscription = $user ? $user->subscriptions()
             ->whereIn('status', ['active', 'trial'])

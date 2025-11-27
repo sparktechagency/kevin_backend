@@ -10,6 +10,7 @@ use App\Service\Dream\CheckinService;
 use App\Service\Dream\IndexService;
 use App\Service\Dream\ProgressService;
 use App\Service\Dream\ReflectionServic;
+use App\Service\Dream\SmartSuggestionService;
 use App\Service\Dream\StoreService;
 use App\Service\Dream\UpcommingService;
 use App\Service\Dream\ViewService;
@@ -17,7 +18,7 @@ use Illuminate\Http\Request;
 
 class DreamController extends Controller
 {
-     protected $indexService;
+    protected $indexService;
     protected $storeService;
     protected $checkinService;
     protected $viewService;
@@ -27,6 +28,7 @@ class DreamController extends Controller
     protected $upcommingService;
     protected $reflectionServic;
     protected $aiFeedbackService;
+    protected $smartSuggestionService;
     public function __construct(
         IndexService $indexService,
         StoreService $storeService,
@@ -36,7 +38,8 @@ class DreamController extends Controller
         BoostService $boostService,
         UpcommingService $upcommingService,
         ReflectionServic $reflectionServic,
-        AiFeedbackService $aiFeedbackService
+        AiFeedbackService $aiFeedbackService,
+        SmartSuggestionService $smartSuggestionService,
     ){
         $this->indexService = $indexService;
         $this->storeService = $storeService;
@@ -47,6 +50,7 @@ class DreamController extends Controller
         $this->upcommingService = $upcommingService;
         $this->reflectionServic = $reflectionServic;
         $this->aiFeedbackService = $aiFeedbackService;
+        $this->smartSuggestionService = $smartSuggestionService;
     }
     public function index(Request $request)
     {
@@ -103,5 +107,10 @@ class DreamController extends Controller
             return $this->aiFeedbackService->aiFeedback($request);
         });
     }
-
+     public function smartSuggestion(Request $request)
+    {
+        return $this->execute(function()use ($request){
+            return $this->smartSuggestionService->smartSuggestion($request);
+        });
+    }
 }
