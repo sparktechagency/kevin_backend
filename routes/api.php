@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DreamController;
 use App\Http\Controllers\Api\ManageUserController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OpenAIContoller;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\SubscriptionController;
@@ -75,7 +77,7 @@ Route::prefix('dream')->group(function () {
             Route::get('productivity-boost', 'productivityBoost');
             Route::get('note/{dream_id}', 'note');
             Route::get('ai-feedback', 'aiFeedback');
-
+            Route::get('smart-suggestion', 'smartSuggestion');
         });
     });
 });
@@ -85,6 +87,7 @@ Route::prefix('voice-note')->group(function () {
             Route::get('index', 'index');
             Route::post('store', 'store');
             Route::get('view/{id}', 'view');
+            Route::get('voiceToText', 'voiceToText');
         });
     });
 });
@@ -102,7 +105,33 @@ Route::prefix('post')->group(function () {
         });
     });
 });
+Route::prefix('notification')->group(function () {
+    Route::group(['controller' => NotificationController::class], function () {
+        Route::middleware(['auth:sanctum', 'user'])->group(function () {
+            Route::get('index', 'index');
+            Route::post('create', 'create');
+            Route::put('update/{id}', 'update');
+            Route::delete('delete/{id}', 'destroy');
+            Route::get('get', 'getNotification');
+            Route::post('read/{id}', 'markAsRead');
+            Route::post('read-all', 'markAllAsRead');
+        });
+    });
+});
 //admin
+Route::prefix('admin-dashboard')->group(function () {
+    Route::group(['controller' => AdminDashboardController::class], function () {
+        Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+            Route::get('index', 'index');
+            Route::get('analytics', 'analytics');
+            Route::get('get-report', 'getReport');
+            Route::post('create-report', 'createReport');
+            Route::put('update-report/{report_id}', 'updateReport');
+            Route::delete('delete-report/{report_id}', 'deleteReport');
+            Route::put('update-plan/{plan}', 'updatePlan');
+        });
+    });
+});
 Route::prefix('company')->group(function () {
     Route::group(['controller' => CompanyController::class], function () {
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -116,8 +145,8 @@ Route::prefix('company')->group(function () {
 });
 Route::prefix('category')->group(function () {
     Route::group(['controller' => CategoryController::class], function () {
+        Route::get('index', 'index')->middleware(['auth:sanctum', 'user']);
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-            Route::get('index', 'index');
             Route::post('store', 'store');
             Route::put('update/{id}', 'update');
             Route::get('view/{id}', 'view');
@@ -144,7 +173,6 @@ Route::prefix('department')->group(function () {
         });
     });
 });
-
 Route::prefix('manage-user')->group(function () {
     Route::group(['controller' => ManageUserController::class], function () {
         Route::middleware(['auth:sanctum', 'manager'])->group(function () {

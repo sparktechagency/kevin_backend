@@ -10,7 +10,7 @@ class ChatHistoryService
     use ResponseHelper;
     public function history()
     {
-        $chats = Chat::orderBy('created_at', 'desc')->get();
+        $chats = Chat::where('user_id',auth()->id())->orderBy('created_at', 'desc')->get();
         return $this->successResponse($chats, "Chat history retrieved successfully.");
     }
 

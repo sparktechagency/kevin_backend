@@ -18,7 +18,7 @@ class UpdateService
         $user->update([
             'name'         => $data['name'],
             'email'        => $data['email'],
-            'employee_pin' => $data['employee_code'],
+            'employee_pin' => $data['employee_pin'],
             'role'         => $data['role'],
         ]);
 

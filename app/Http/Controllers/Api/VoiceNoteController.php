@@ -8,6 +8,7 @@ use App\Service\VoiceNote\IndexService;
 use App\Service\VoiceNote\StoreService;
 use App\Service\VoiceNote\ViewService;
 use Illuminate\Http\Request;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class VoiceNoteController extends Controller
 {
@@ -43,6 +44,34 @@ class VoiceNoteController extends Controller
         return $this->execute(function () use ($note_id) {
             return $this->viewService->view($note_id);
         });
+    }
+    public function voiceToText(Request $request)
+    {
+        // Validate the uploaded audio
+        $request->validate([
+            'audio' => 'required|file|mimes:mp3,wav,m4a',
+        ]);
+
+        try {
+            $audioFile = $request->file('audio');
+
+            // Call OpenAI Whisper API
+            $response = OpenAI::audio()->transcriptions()->create([
+                'file' => $audioFile->getRealPath(),
+                'model' => 'whisper-1', // Whisper speech-to-text model
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'text' => $response->text ?? '',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error converting audio: ' . $e->getMessage(),
+            ]);
+        }
     }
 }
 

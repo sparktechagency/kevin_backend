@@ -30,7 +30,8 @@ class User extends Authenticatable
         'ends_at',
         'trial_ends_at',
         'is_notification',
-        'is_subscribed'
+        'is_subscribed',
+        'fcm_token'
     ];
 
     /**
