@@ -41,17 +41,17 @@ services:
       - laravel
 
   mysql:
-  image: mysql:8
-  container_name: laravel_mysql
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-    MYSQL_DATABASE: kevin_db
-  ports:
-    - "3307:3306"
-  volumes:
-    - mysql_data:/var/lib/mysql
-  networks:
-    - laravel
+    image: mysql:8
+    container_name: laravel_mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: kevin_db
+    ports:
+        - "3307:3306"
+    volumes:
+        - mysql_data:/var/lib/mysql
+    networks:
+        - laravel
 
 
   redis:
