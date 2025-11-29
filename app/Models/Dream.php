@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Dream extends Model
 {
     protected $fillable = [
@@ -34,5 +34,8 @@ class Dream extends Model
     {
         return $this->hasMany(DreamActivity::class, 'dream_id', 'id');
     }
-
+     public function dreams(): HasMany
+    {
+        return $this->hasMany(Dream::class, 'user_id'); // make sure foreign key is correct
+    }
 }

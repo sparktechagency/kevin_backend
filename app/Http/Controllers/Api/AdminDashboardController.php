@@ -7,6 +7,7 @@ use App\Http\Requests\Plan\UpdatePlanRequest;
 use App\Http\Requests\Report\CreateReportRequest;
 use App\Service\AdminDashboard\AnalyticsService;
 use App\Service\AdminDashboard\IndexService;
+use App\Service\AdminDashboard\RoiService;
 use App\Service\Report\CreateReportService;
 use App\Service\Report\DeleteReportService;
 use App\Service\Report\GetReportService;
@@ -23,6 +24,7 @@ class AdminDashboardController extends Controller
     protected $updateReportService;
     protected $deleteReportService;
     protected $updatePlanService;
+    protected $roiService;
 
     public function __construct(
         IndexService $indexService,
@@ -32,6 +34,7 @@ class AdminDashboardController extends Controller
         UpdateReportService $updateReportService,
         DeleteReportService $deleteReportService,
         UpdatePlanService $updatePlanService,
+        RoiService $roiService,
     ){
         $this->indexService = $indexService;
         $this->analyticsService = $analyticsService;
@@ -40,6 +43,7 @@ class AdminDashboardController extends Controller
         $this->updateReportService = $updateReportService;
         $this->deleteReportService = $deleteReportService;
         $this->updatePlanService = $updatePlanService;
+        $this->roiService = $roiService;
     }
     public function index(Request $request)
     {
@@ -84,6 +88,12 @@ class AdminDashboardController extends Controller
         return $this->execute(function()use($updatePlanRequest, $plan){
             $data = $updatePlanRequest->validated();
             return $this->updatePlanService->updatePlan($data, $plan);
+        });
+    }
+    public function roi(Request $request)
+    {
+        return $this->execute(function()use($request){
+            return $this->roiService->roi($request);
         });
     }
 }

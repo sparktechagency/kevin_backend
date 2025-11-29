@@ -72,4 +72,9 @@ class User extends Authenticatable
             ->latest()
             ->first();
     }
+    public function routeNotificationForFcm()
+    {
+        return $this->device_token;
+    }
+
 }

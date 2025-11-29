@@ -31,6 +31,7 @@ class StoreService
         if (!empty($data['send_welcome_email']) && $data['send_welcome_email'] == true) {
             Mail::to($company->company_email)->queue(new WelcomeEmail($company));
         }
+        
         return $this->successResponse($company, 'Company created successfully.');
     }
 }

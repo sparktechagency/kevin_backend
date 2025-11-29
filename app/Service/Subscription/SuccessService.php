@@ -5,27 +5,44 @@ namespace App\Service\Subscription;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Service\Notification\NotificationService;
 use App\Traits\ResponseHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SuccessService
 {
-   use ResponseHelper;
+    use ResponseHelper;
 
-   public function success($request, $planId)
+    public function success($request, $planId)
     {
-        $plan = Plan::find($planId);
-        if (!$plan) {
-            return $this->errorResponse("Plan not found.");
-        }
-        if ($plan->name === 'Starter') {
-            return $this->errorResponse('You cannot cancel the Starter plan.');
-        }
-        $user = auth()->user();
-        $subscription = Subscription::where('user_id',$user->id)->where('plan_id',$planId)->first();
-        DB::beginTransaction();
         try {
-            // Transaction create
+            $plan = Plan::find($planId);
+            if (!$plan) {
+                return $this->errorResponse("Plan not found.");
+            }
+
+            if ($plan->name === 'Starter') {
+                return $this->errorResponse('You cannot cancel the Starter plan.');
+            }
+
+            $user = auth()->user();
+            if (!$user) {
+                return $this->errorResponse('User not authenticated.');
+            }
+
+            $subscription = Subscription::where('user_id', $user->id)
+                ->where('plan_id', $planId)
+                ->first();
+
+            if (!$subscription) {
+                return $this->errorResponse("Subscription not found.");
+            }
+
+            DB::beginTransaction();
+
+            // 1️⃣ Create transaction
             $transaction = Transaction::create([
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
@@ -39,31 +56,62 @@ class SuccessService
                 'paid_at' => now(),
             ]);
 
-            // Subscription update
+            // 2️⃣ Update current subscription
             $subscription->update([
                 'status' => 'active',
                 'trial_ends_at' => null,
                 'ends_at' => now()->addMonth(),
             ]);
-             Subscription::where('user_id', $user->id)
-                ->where('id', '!=', $subscription->id)
-                ->update(['status' => 'inactive','trial_ends_at'=>null]);
 
-            // User update
+            // 3️⃣ Deactivate other subscriptions
+            Subscription::where('user_id', $user->id)
+                ->where('id', '!=', $subscription->id)
+                ->update(['status' => 'inactive', 'trial_ends_at' => null]);
+
+            // 4️⃣ Update user subscription info
             $user->update([
                 'trial_ends_at' => null,
                 'ends_at' => now()->addMonth(),
+                'is_subscribed' => $plan->name,
             ]);
 
             DB::commit();
+
+            // 5️⃣ Send notifications
+            $notificationService = new NotificationService();
+
+            // Notify the user
+            $notificationService->send($user, [
+                'name' => 'Subscription Activated',
+                'message' => "Your {$plan->name} plan has been activated successfully.",
+                'type' => 'SUBSCRIPTION',
+                'plan_id' => $plan->id,
+            ]);
+
+            // Notify all admins
+            $admins = User::where('role', 'ADMIN')->get();
+            if ($admins->isNotEmpty()) {
+                foreach ($admins as $admin) {
+                    $notificationService->send($admin, [
+                        'name' => 'New Subscription Payment',
+                        'message' => "{$user->name} has successfully subscribed to the {$plan->name} plan.",
+                        'type' => 'SUBSCRIPTION',
+                        'plan_id' => $plan->id,
+                    ]);
+                }
+            }
 
             return $this->successResponse([
                 'transaction' => $transaction,
                 'plan' => $plan,
             ], "Payment successful and plan activated.");
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->errorResponse("Something went wrong!");
+            Log::error('Subscription success error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return $this->errorResponse("Something went wrong! Please try again.");
         }
     }
 }

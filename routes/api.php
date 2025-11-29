@@ -129,6 +129,7 @@ Route::prefix('admin-dashboard')->group(function () {
             Route::put('update-report/{report_id}', 'updateReport');
             Route::delete('delete-report/{report_id}', 'deleteReport');
             Route::put('update-plan/{plan}', 'updatePlan');
+            Route::get('roi', 'roi');
         });
     });
 });

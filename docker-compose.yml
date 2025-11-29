@@ -17,12 +17,24 @@ services:
     build: .
     container_name: laravel_queue
     working_dir: /var/www
-    command: php artisan queue:work --tries=3 --timeout=120
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=120
     volumes:
       - ./:/var/www
     depends_on:
       - app
       - redis
+    networks:
+      - laravel
+
+  scheduler:
+    build: .
+    container_name: laravel_scheduler
+    working_dir: /var/www
+    command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - app
     networks:
       - laravel
 
@@ -53,7 +65,6 @@ services:
     networks:
         - laravel
 
-
   redis:
     image: redis:latest
     container_name: laravel_redis
@@ -67,3 +78,4 @@ networks:
 
 volumes:
   mysql_data:
+
