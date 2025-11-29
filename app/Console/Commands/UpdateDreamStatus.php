@@ -14,30 +14,41 @@ class UpdateDreamStatus extends Command
     public function handle()
     {
         $now = Carbon::now();
+        $dreams = Dream::all();
 
-        $allDreams = Dream::all();
-
-        foreach ($allDreams as $dream) {
-            $updated = false; // flag to check if we need to save
+        foreach ($dreams as $dream) {
+            $updated = false;
 
             $startDate = $dream->start_date ? Carbon::parse($dream->start_date) : null;
-            $endDate = $dream->end_date ? Carbon::parse($dream->end_date) : null;
+            $endDate   = $dream->end_date   ? Carbon::parse($dream->end_date)   : null;
             $currentStatus = $dream->status;
 
-            // 1️⃣ Fill missing end_date based on frequency (if null)
+            /**
+             * 1️⃣ Set end_date if missing
+             */
             if (!$endDate && $startDate) {
+
                 switch (strtolower($dream->frequency)) {
+
                     case 'weekly':
-                        $endDate = $startDate->copy()->addDays(6);
+                        $endDate = $startDate->copy()->addDays(6); // Weekly = 7 days total
                         break;
 
                     case 'monthly':
-                        $endDate = $startDate->copy()->addMonth();
+                        $endDate = $startDate->copy()->addDays(29); // Monthly = 30 days
+                        break;
+
+                    case 'quarterly':
+                        $endDate = $startDate->copy()->addDays(89); // Quarterly = 90 days
+                        break;
+
+                    case 'yearly':
+                        $endDate = $startDate->copy()->addDays(364); // Yearly = 365 days
                         break;
 
                     case 'daily':
                     default:
-                        $endDate = $startDate;
+                        $endDate = $startDate->copy()->addDay(); // Daily = 1 day
                         break;
                 }
 
@@ -45,29 +56,35 @@ class UpdateDreamStatus extends Command
                 $updated = true;
             }
 
-            // 2️⃣ Determine expected status
-            $expectedStatus = $currentStatus; // default: no change
-
+            /**
+             * 2️⃣ Determine expected status
+             */
             if ($endDate && $endDate->lt($now)) {
                 $expectedStatus = 'Completed';
             } elseif ($startDate && $startDate->gt($now)) {
                 $expectedStatus = 'Upcoming';
             } elseif ($startDate && $endDate && $startDate->lte($now) && $endDate->gte($now)) {
                 $expectedStatus = 'Active';
+            } else {
+                $expectedStatus = $currentStatus;
             }
 
-            // 3️⃣ Update status only if different
+            /**
+             * 3️⃣ Update status if changed
+             */
             if ($currentStatus !== $expectedStatus) {
                 $dream->status = $expectedStatus;
                 $updated = true;
             }
 
-            // 4️⃣ Save only if something changed
+            /**
+             * 4️⃣ Save only if needed
+             */
             if ($updated) {
                 $dream->save();
             }
         }
 
-        $this->info("Dreams updated successfully (only changed records were saved).");
+        $this->info("Dream statuses updated successfully.");
     }
 }

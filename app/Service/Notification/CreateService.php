@@ -29,32 +29,22 @@ class CreateService
         }
 
         // 3. Send Notification
-        if ($user->is_notification == true) {
-            // $this->sendPushToAllUsers($notify);
-            $this->sendNotificationToRole($notify->role, $notify);
-        } else {
-            $this->sendNotificationToRole($notify->role, $notify);
-        }
+        $this->sendNotificationToRole($notify->role, $notify, $user);
 
         return $this->successResponse($notify,'Notification sent successfully.');
     }
 
-    private function sendPushToAllUsers($notify)
+    private function sendNotificationToRole($role, $notify, $sender)
     {
-        $users = User::whereNotNull('fcm_token')->get();
+        $users = User::where('role', $role)->get();
 
-        foreach ($users as $user) {
-            $user->notify(new FcmNotify($notify));
-        }
-    }
+        $notificationData = [
+            'name'    => $notify->name,
+            'message' => $notify->message,
+            'type'    => $sender->role ?? 'USER', // corrected variable
+        ];
 
-    private function sendNotificationToRole($role, $notify)
-    {
-        $users = User::where('role', $role)
-                     ->get();
-
-        foreach ($users as $user) {
-            $user->notify(new FcmNotify($notify));
-        }
+        $notificationService = new NotificationService();
+        $notificationService->send($users, $notificationData);
     }
 }

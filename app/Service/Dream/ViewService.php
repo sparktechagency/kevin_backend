@@ -24,11 +24,15 @@ class ViewService
         $today = Carbon::today();
         $startDate = Carbon::parse($dream->start_date);
 
-        // Determine end date based on frequency
+        // -----------------------------------
+        // END DATE CALCULATION (UPDATED)
+        // -----------------------------------
         $endDate = match ($dream->frequency) {
-            'Weekly'  => $startDate->copy()->addDays(6),
-            'Monthly' => $startDate->copy()->addDays(30),
-            default   => $dream->end_date ? Carbon::parse($dream->end_date) : $startDate->copy()->addDays(30),
+            'Weekly'     => $startDate->copy()->addDays(6),
+            'Monthly'    => $startDate->copy()->addDays(30),
+            'Quarterly'  => $startDate->copy()->addDays(89),
+            'Yearly'     => $startDate->copy()->addDays(364),
+            default      => $dream->end_date ? Carbon::parse($dream->end_date) : $startDate->copy()->addDays(30),
         };
 
         $period = CarbonPeriod::create($startDate, '1 day', $endDate);
@@ -58,15 +62,23 @@ class ViewService
             $totalUnits++;
         }
 
-        // -----------------------------
-        // Progress calculation updated
-        // -----------------------------
+        // -----------------------------------
+        // PROGRESS CALCULATION (UPDATED)
+        // -----------------------------------
         if ($dream->frequency === 'Weekly') {
             $required = $dream->per_week ?? 7;
             $progress = $required > 0 ? round(($completedUnits / $required) * 100, 2) : 0;
 
         } elseif ($dream->frequency === 'Monthly') {
             $required = $dream->per_month ?? 30;
+            $progress = $required > 0 ? round(($completedUnits / $required) * 100, 2) : 0;
+
+        } elseif ($dream->frequency === 'Quarterly') {
+            $required = $dream->per_quarter ?? 90;
+            $progress = $required > 0 ? round(($completedUnits / $required) * 100, 2) : 0;
+
+        } elseif ($dream->frequency === 'Yearly') {
+            $required = $dream->per_year ?? 365;
             $progress = $required > 0 ? round(($completedUnits / $required) * 100, 2) : 0;
 
         } else { // Daily
@@ -82,7 +94,7 @@ class ViewService
             $remainingStatus = $today->diffInDays($endDate) . " days left";
         }
 
-        // Calculate streak
+        // Streak calculation
         $streakDays = 0;
         $checkDate = $today->copy();
         while ($checkDate->gte($startDate)) {

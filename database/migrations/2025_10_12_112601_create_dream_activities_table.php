@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('dream_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->enum('type',['Daily','Weekly','Monthly'])->default('Daily');
+            $table->enum('type',['Daily','Weekly','Monthly','Yearly','Quarterly'])->default('Daily');
             $table->integer('log_checkin_in')->default(0);
             $table->timestamps();
         });

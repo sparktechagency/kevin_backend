@@ -61,7 +61,7 @@ class DreamController extends Controller
     public function store(CreateRequest $createRequest)
     {
         return $this->execute(function()use($createRequest) {
-            $data = $createRequest->validated();
+             $data = $createRequest->validated();
             return $this->storeService->store($data);
         });
     }

@@ -17,13 +17,15 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('frequency', ['Daily', 'Weekly', 'Monthly']);
+            $table->enum('frequency', ['Daily', 'Weekly', 'Monthly','Yearly','Quarterly']);
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->time('from')->nullable();
             $table->time('to')->nullable();
             $table->integer('per_week')->nullable();
             $table->integer('per_month')->nullable();
+            $table->integer('per_year')->nullable();
+            $table->integer('per_quarter')->nullable();
             $table->string('status')->default('Pending');
             $table->timestamps();
         });

@@ -15,43 +15,71 @@ class IndexService
     public function index($request)
     {
         $userId = auth()->id();
-        $dreams = Dream::where('user_id', $userId)->whereIn('status', ['Active', 'Pending'])->get();
+        $dreams = Dream::where('user_id', $userId)
+            ->whereIn('status', ['Active', 'Pending'])
+            ->get();
 
         $dailyActivities = [];
         $weeklyActivities = [];
         $monthlyActivities = [];
+        $quarterlyActivities = [];
+        $yearlyActivities = [];
+
         $completedDreams = [];
         $upcomingDreams = [];
 
         $today = Carbon::today();
 
         foreach ($dreams as $dream) {
+
             $activityStatus = [];
             $completedActivities = 0;
             $totalActivities = 0;
 
             $startDate = Carbon::parse($dream->start_date);
 
-            // Set end_date based on frequency
-            if ($dream->frequency === 'Weekly') {
-                $endDate = $startDate->copy()->addDays(6); // 7 days
-            } elseif ($dream->frequency === 'Monthly') {
-                $endDate = $startDate->copy()->addDays(30); // 30 days
-            } else { // Daily
-                $endDate = $dream->end_date ? Carbon::parse($dream->end_date) : $startDate->copy()->addDays(30);
+            // ---------------------------------------------------
+            // DEFINE END DATE BY FREQUENCY
+            // ---------------------------------------------------
+            switch ($dream->frequency) {
+                case 'Weekly':
+                    $endDate = $startDate->copy()->addDays(6);
+                    break;
+
+                case 'Monthly':
+                    $endDate = $startDate->copy()->addDays(29);
+                    break;
+
+                case 'Quarterly':
+                    $endDate = $startDate->copy()->addDays(89);
+                    break;
+
+                case 'Yearly':
+                    $endDate = $startDate->copy()->addDays(364);
+                    break;
+
+                default: // Daily
+                    $endDate = $dream->end_date
+                        ? Carbon::parse($dream->end_date)
+                        : $startDate->copy()->addDays(30);
+                    break;
             }
 
             $period = CarbonPeriod::create($startDate, '1 day', $endDate);
 
-            // Fetch activity records
+            // ---------------------------------------------------
+            // FETCH USER ACTIVITY RECORDS
+            // ---------------------------------------------------
             $activities = DreamActivity::where('user_id', $userId)
                 ->where('dream_id', $dream->id)
                 ->where('type', $dream->frequency)
                 ->pluck('created_at')
-                ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
+                ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
                 ->toArray();
 
-            // Track activity day status
+            // ---------------------------------------------------
+            // FILL ACTIVITY STATUS
+            // ---------------------------------------------------
             foreach ($period as $date) {
                 $key = $date->format('Y-m-d');
 
@@ -67,28 +95,38 @@ class IndexService
                 $totalActivities++;
             }
 
-            // ------------------------------
-            // UPDATED PROGRESS CALCULATION
-            // ------------------------------
-            if ($dream->frequency === 'Weekly') {
-                $required = $dream->per_week ?? 7;
-                $progress = $required > 0
-                    ? round(($completedActivities / $required) * 100, 2)
-                    : 0;
+            // ---------------------------------------------------
+            // CALCULATE PROGRESS
+            // ---------------------------------------------------
+            switch ($dream->frequency) {
+                case 'Weekly':
+                    $required = $dream->per_week ?? 7;
+                    break;
 
-            } elseif ($dream->frequency === 'Monthly') {
-                $required = $dream->per_month ?? 30;
-                $progress = $required > 0
-                    ? round(($completedActivities / $required) * 100, 2)
-                    : 0;
+                case 'Monthly':
+                    $required = $dream->per_month ?? 30;
+                    break;
 
-            } else { // Daily
-                $progress = $totalActivities > 0
-                    ? round(($completedActivities / $totalActivities) * 100, 2)
-                    : 0;
+                case 'Quarterly':
+                    $required = $dream->per_quarter ?? 90;
+                    break;
+
+                case 'Yearly':
+                    $required = $dream->per_year ?? 365;
+                    break;
+
+                default: // Daily
+                    $required = $totalActivities;
+                    break;
             }
 
-            // Determine remaining status
+            $progress = $required > 0
+                ? round(($completedActivities / $required) * 100, 2)
+                : 0;
+
+            // ---------------------------------------------------
+            // REMAINING STATUS
+            // ---------------------------------------------------
             if ($today->lt($startDate)) {
                 $remainingStatus = 'Upcoming';
             } elseif ($today->gt($endDate)) {
@@ -99,6 +137,9 @@ class IndexService
                 $remainingStatus = $today->diffInDays($endDate) . " days left";
             }
 
+            // ---------------------------------------------------
+            // FORMAT OUTPUT
+            // ---------------------------------------------------
             $data = [
                 'id' => $dream->id,
                 'name' => $dream->name,
@@ -115,14 +156,18 @@ class IndexService
                 'completed_units' => $completedActivities,
             ];
 
-            // Categorize by frequency
+            // ---------------------------------------------------
+            // CATEGORIZE BY FREQUENCY
+            // ---------------------------------------------------
             match ($dream->frequency) {
                 'Daily' => $dailyActivities[] = $data,
                 'Weekly' => $weeklyActivities[] = $data,
                 'Monthly' => $monthlyActivities[] = $data,
+                'Quarterly' => $quarterlyActivities[] = $data,
+                'Yearly' => $yearlyActivities[] = $data,
             };
 
-            // Completed / Upcoming
+            // COMPLETED & UPCOMING
             if ($today->gt($endDate)) {
                 $completedDreams[] = $data;
             } elseif ($today->lt($startDate)) {
@@ -130,12 +175,17 @@ class IndexService
             }
         }
 
+        // ---------------------------------------------------
+        // FINAL RESPONSE
+        // ---------------------------------------------------
         return response()->json([
             'message' => 'Dreams and activities fetched successfully.',
             'data' => [
                 'daily_activities' => $dailyActivities,
                 'weekly_activities' => $weeklyActivities,
                 'monthly_activities' => $monthlyActivities,
+                'quarterly_activities' => $quarterlyActivities,
+                'yearly_activities' => $yearlyActivities,
                 'completed_dreams' => $completedDreams,
                 'upcoming_dreams' => $upcomingDreams,
             ]

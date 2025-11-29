@@ -20,6 +20,8 @@ class Dream extends Model
         'per_month',
         'status',
         'icon',
+        'per_year',
+        'per_quarter',
     ];
     public function user()
     {
