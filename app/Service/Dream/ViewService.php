@@ -115,6 +115,7 @@ class ViewService
             'frequency' => $dream->frequency,
             'from' => $dream->from,
             'to' => $dream->to,
+            'goal' => json_decode($dream->goal),
             'category' => $dream->category,
             'activity_status' => $activityStatus,
             'status' => $dream->status,

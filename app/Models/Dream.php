@@ -22,6 +22,7 @@ class Dream extends Model
         'icon',
         'per_year',
         'per_quarter',
+        'goal',
     ];
     public function user()
     {

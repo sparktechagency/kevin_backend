@@ -25,75 +25,82 @@ class CheckoutService
             return $this->errorResponse('Plan not found.');
         }
 
-        // Check if already subscribed to this plan
-        $existing = Subscription::where('user_id', $user->id)
-            ->where('plan_id', $plan->id)
+        // Check if user already has active subscription or trial
+        $currentSub = Subscription::where('user_id', $user->id)
+            ->where(function ($query) {
+                $query->where('status', 'active')
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'trial')
+                            ->where(function ($subQ) {
+                                $subQ->whereNull('trial_ends_at')
+                                    ->orWhere('trial_ends_at', '>', now());
+                            });
+                    });
+            })
             ->first();
 
-        if ($existing && $existing->status === 'active') {
-            return $this->errorResponse('You are already subscribed to this plan.');
+        // If the current subscription is for the same plan, prevent duplicate
+        if ($currentSub && $currentSub->plan_id == $plan->id) {
+            return $this->errorResponse('You are already on this plan.');
         }
 
-        // Cancel all active subscriptions
-        Subscription::where('user_id', $user->id)
-            ->where('status', 'active')
-            ->update(['status' => 'canceled']);
+        // Determine trial length
+        $trialEnds = $plan->id == 1 ? now()->addMonths(3) : now()->addDays(7);
 
-        if ($plan->price == 0) {
-            // Free plan
-            $subscription = Subscription::create([
-                'user_id' => $user->id,
+        if ($currentSub) {
+            // Update existing subscription instead of creating a new one
+            $currentSub->update([
                 'plan_id' => $plan->id,
-                'stripe_subscription_id' => 'free_' . uniqid(),
-                'status' => 'active',
-                'ends_at' => now()->addMonth(),
-            ]);
-
-            $user->is_subscribed = $plan->name;
-            $user->trial_ends_at = null;
-            $user->save();
-
-            $message = "You have successfully subscribed to the {$plan->name} plan.";
-
-        } else {
-            // Paid plan (trial)
-            $subscription = Subscription::create([
-                'user_id' => $user->id,
-                'plan_id' => $plan->id,
-                'stripe_subscription_id' => 'manual_' . uniqid(),
+                'stripe_subscription_id' => $plan->id == 1 ? 'free_' . uniqid() : 'manual_' . uniqid(),
                 'status' => 'trial',
-                'trial_ends_at' => now()->addDays(7),
+                'trial_ends_at' => $trialEnds,
                 'ends_at' => now()->addMonth(),
             ]);
 
-            $user->is_subscribed = $plan->name;
-            $user->trial_ends_at = now()->addDays(7);
-            $user->save();
+            $subscription = $currentSub;
+            $message = $plan->id == 1
+                ? "Your subscription has been updated. You are now on a 3-month free trial of the {$plan->name} plan."
+                : "Your subscription has been updated. Trial for {$plan->name} plan created.";
+        } else {
+            // Create new subscription if user had no previous one
+            $subscription = Subscription::create([
+                'user_id' => $user->id,
+                'plan_id' => $plan->id,
+                'stripe_subscription_id' => $plan->id == 1 ? 'free_' . uniqid() : 'manual_' . uniqid(),
+                'status' => 'trial',
+                'trial_ends_at' => $trialEnds,
+                'ends_at' => now()->addMonth(),
+            ]);
 
-            $message = "Trial subscription for {$plan->name} plan created. Awaiting payment confirmation.";
+            $message = $plan->id == 1
+                ? "You are now on a 3-month free trial of the {$plan->name} plan."
+                : "Trial subscription for {$plan->name} plan created. Awaiting payment confirmation.";
         }
 
-        // Prepare notification data
+        // Update user info
+        $user->is_subscribed = $subscription->status;
+        $user->trial_ends_at = $trialEnds;
+        $user->save();
+
+        // Notifications
         $notificationData = [
-            'name' => 'New Subscription',
-            'message' => "{$user->name} has subscribed to the {$plan->name} plan.",
+            'name' => 'Subscription Update',
+            'message' => "{$user->name} has switched to the {$plan->name} plan.",
             'type' => 'SUBSCRIPTION',
             'plan_id' => $plan->id
         ];
 
         $notificationService = new NotificationService();
-
-        // Notify the user
         $notificationService->send($user, $notificationData);
 
-        // Notify all admins
         $admins = User::where('role', 'ADMIN')->get();
-        if ($admins->isNotEmpty()) {
-            foreach ($admins as $admin) {
-                $notificationService->send($admin, $notificationData);
-            }
+        foreach ($admins as $admin) {
+            $notificationService->send($admin, $notificationData);
         }
 
         return $this->successResponse($subscription, $message);
     }
+
+
+
 }

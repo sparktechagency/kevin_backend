@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('per_month')->nullable();
             $table->integer('per_year')->nullable();
             $table->integer('per_quarter')->nullable();
+            $table->json('goal')->nullable();
             $table->string('status')->default('Pending');
             $table->timestamps();
         });

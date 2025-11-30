@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Subscription;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UpdateSubscriptionStatus extends Command
 {
@@ -13,36 +14,36 @@ class UpdateSubscriptionStatus extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
+        try {
+            $now = Carbon::now();
 
-        // 1️ End trial subscriptions
-        $trialSubscriptions = Subscription::where('status', 'trial')
-            ->whereNotNull('trial_ends_at')
-            ->where('trial_ends_at', '<', $now)
-            ->get();
+            // 1️⃣ Expire trial subscriptions
+            $trialUpdated = Subscription::where('status', 'trial')
+                ->whereNotNull('trial_ends_at')
+                ->where('trial_ends_at', '<', $now)
+                ->update(['status' => 'expired']);
 
-        foreach ($trialSubscriptions as $subscription) {
-            $subscription->update([
-                'status' => 'expired',
+            if ($trialUpdated) {
+                $this->info("Expired {$trialUpdated} trial subscriptions.");
+            }
+
+            // 2️⃣ Expire active subscriptions
+            $activeUpdated = Subscription::where('status', 'active')
+                ->whereNotNull('ends_at')
+                ->where('ends_at', '<', $now)
+                ->update(['status' => 'expired']);
+
+            if ($activeUpdated) {
+                $this->info("Expired {$activeUpdated} active subscriptions.");
+            }
+
+            $this->info('All expired subscriptions updated successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('UpdateSubscriptionStatus error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
             ]);
-
-            $this->info("Trial ended for subscription ID: {$subscription->id}");
+            $this->error('Something went wrong while updating subscriptions.');
         }
-
-        // 2️ End active subscriptions
-        $activeSubscriptions = Subscription::where('status', 'active')
-            ->whereNotNull('ends_at')
-            ->where('ends_at', '<', $now)
-            ->get();
-
-        foreach ($activeSubscriptions as $subscription) {
-            $subscription->update([
-                'status' => 'expired',
-            ]);
-
-            $this->info("Subscription expired ID: {$subscription->id}");
-        }
-
-        $this->info('All expired subscriptions updated successfully.');
     }
 }

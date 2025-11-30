@@ -38,6 +38,8 @@ class CreateRequest extends FormRequest
             'per_quarter'   => 'nullable|integer|min:1',
             'per_year'      => 'nullable|integer|min:1',
 
+            'goal'           => 'nullable|array',
+            'goal.*'        => 'string',
             'status'        => 'nullable|boolean',
         ];
     }
@@ -82,6 +84,9 @@ class CreateRequest extends FormRequest
 
             'per_year.integer'      => 'The per year value must be an integer.',
             'per_year.min'          => 'The per year value must be at least 1.',
+
+            'goal.array'       => 'The goal field must be an array.',
+            'goal.*.string'    => 'Each goal item must be a text value.',
 
             'status.boolean'        => 'The status must be true or false.',
         ];
