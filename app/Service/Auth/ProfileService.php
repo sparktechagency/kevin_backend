@@ -13,7 +13,6 @@ class ProfileService
     public function getProfile()
     {
         $user = Auth::user();
-
         // User's subscription (active or trial)
         $subscription = Subscription::where('user_id', $user->id)
             ->where(function ($query) {
