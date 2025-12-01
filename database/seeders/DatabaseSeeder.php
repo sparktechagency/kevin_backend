@@ -71,5 +71,9 @@ class DatabaseSeeder extends Seeder
         foreach ($demoUsers as $user) {
             User::create($user);
         }
+       $this->call([
+            CategorySeeder::class,
+        ]);
     }
+
 }
