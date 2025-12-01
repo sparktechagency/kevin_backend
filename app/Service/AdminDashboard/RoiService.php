@@ -2,10 +2,10 @@
 
 namespace App\Service\AdminDashboard;
 
-use App\Models\Category;
-use App\Models\Dream;
-use App\Models\DreamActivity;
 use App\Models\User;
+use App\Models\Dream;
+use App\Models\Category;
+use App\Models\DreamActivity;
 use App\Traits\ResponseHelper;
 use Carbon\Carbon;
 
@@ -13,9 +13,6 @@ class RoiService
 {
     use ResponseHelper;
 
-    /**
-     * Main ROI method
-     */
     public function roi($request)
     {
         // 1️⃣ Total Active Employees
@@ -42,14 +39,14 @@ class RoiService
         // 5️⃣ Category Insights
         $categoryData = $this->getCategoryInsights();
 
-        // 6️⃣ ROI Trend (Jan–Dec)
+        // 6️⃣ ROI Trends (Jan–Dec)
         $roiTrend = $this->getRoiTrend();
 
         // 7️⃣ Employee Impact Leaderboard
         $leaderboard = $this->getLeaderboard();
 
         // Final Response
-        return $this->success([
+        return $this->successResponse([
             'summary' => [
                 'total_employees'      => $totalEmployees,
                 'total_dreams'         => $totalDreams,
@@ -61,19 +58,21 @@ class RoiService
             'categories'  => $categoryData,
             'roi_trend'   => $roiTrend,
             'leaderboard' => $leaderboard,
-        ]);
+        ], "ROI dashboard generated successfully.");
     }
 
+
     /**
-     * Get total active employees (not banned)
+     * 1️⃣ Get total active employees (not banned)
      */
     private function getActiveEmployeesCount(): int
     {
         return User::where('is_banned', 0)->count();
     }
 
+
     /**
-     * Category Insights
+     * 2️⃣ Category Insights
      */
     private function getCategoryInsights()
     {
@@ -97,14 +96,16 @@ class RoiService
         });
     }
 
+
     /**
-     * ROI Trend (Jan–Dec)
+     * 3️⃣ ROI Trend (Jan–Dec)
      */
     private function getRoiTrend(): array
     {
         $roiTrend = [];
 
         for ($m = 1; $m <= 12; $m++) {
+
             $monthlyCompleted = Dream::whereMonth('updated_at', $m)
                 ->whereYear('updated_at', date('Y'))
                 ->where('status', 'Completed')
@@ -113,7 +114,8 @@ class RoiService
             $monthlyEngagement = DreamActivity::whereMonth('updated_at', $m)
                 ->sum('log_checkin_in');
 
-            $monthlyTotalDreams = Dream::whereMonth('created_at', $m)->count();
+            $monthlyTotalDreams = Dream::whereMonth('created_at', $m)
+                ->count();
 
             $roiTrend[] = [
                 'month'      => Carbon::create()->month($m)->format('F'),
@@ -128,8 +130,9 @@ class RoiService
         return $roiTrend;
     }
 
+
     /**
-     * Employee Impact Leaderboard
+     * 4️⃣ Employee Impact Leaderboard
      */
     private function getLeaderboard()
     {
@@ -137,8 +140,10 @@ class RoiService
             ->take(20)
             ->get()
             ->map(function ($user) {
+
                 $totalDreams = $user->dreams->count();
                 $completedDreams = $user->dreams->where('status', 'Completed')->count();
+
                 $engagement = $user->dreams->sum(fn($dream) =>
                     $dream->activities->sum('log_checkin_in')
                 );

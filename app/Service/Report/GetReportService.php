@@ -17,61 +17,62 @@ class GetReportService
     {
         $reports = Report::all()->map(function ($report) {
 
-            // Decode metrics JSON
-            $metrics = $report->metrics ? json_decode($report->metrics, true) : [];
+            // Decode original metrics JSON
+            $originalMetrics = $report->metrics ? json_decode($report->metrics, true) : [];
 
             // Get all users related to this report
             $users = $this->getUsers($report->manager_id, $report->department_id);
 
-            // Prepare final metric results
-            $metricOutput = [];
+            // Prepare computed metric results
+            $computedMetrics = [];
 
-            foreach ($metrics as $metric) {
+            foreach ($originalMetrics as $metric) {
                 switch ($metric) {
-
                     case 'engagement_score':
-                        $metricOutput['engagement_score'] = $this->metricEngagementScore($users);
+                        $computedMetrics['engagement_score'] = $this->metricEngagementScore($users);
                         break;
 
                     case 'goal_completion':
-                        $metricOutput['goal_completion'] = $this->metricGoalCompletion($users);
+                        $computedMetrics['goal_completion'] = $this->metricGoalCompletion($users);
                         break;
 
                     case 'user_activity':
-                        $metricOutput['user_activity'] = $this->metricUserActivity($users);
+                        $computedMetrics['user_activity'] = $this->metricUserActivity($users);
                         break;
 
                     case 'goal_category':
-                        $metricOutput['goal_category'] = $this->metricGoalCategory($users);
+                        $computedMetrics['goal_category'] = $this->metricGoalCategory($users);
                         break;
 
                     case 'department_metrics':
-                        $metricOutput['department_metrics'] = $this->metricDepartmentMetrics($users);
+                        $computedMetrics['department_metrics'] = $this->metricDepartmentMetrics($users);
                         break;
 
                     case 'manager_impact':
-                        $metricOutput['manager_impact'] = $this->metricManagerImpact($users, $report->manager_id);
+                        $computedMetrics['manager_impact'] = $this->metricManagerImpact($users, $report->manager_id);
                         break;
 
                     case 'user_retention':
-                        $metricOutput['user_retention'] = $this->metricUserRetention($users);
+                        $computedMetrics['user_retention'] = $this->metricUserRetention($users);
                         break;
 
                     case 'roi_metrics':
-                        $metricOutput['roi_metrics'] = $this->metricROI($users);
+                        $computedMetrics['roi_metrics'] = $this->metricROI($users);
                         break;
-
                 }
             }
 
-            $report->metrics = $metricOutput;
+            // Include both original and computed metrics in the response
+            $report->metrics = [
+                'original' => $originalMetrics,
+                'computed' => $computedMetrics
+            ];
 
             return $report;
         });
 
         return $this->successResponse($reports, "Report generated successfully.");
     }
-
 
     // ----------------------------------------------------------------
     //                  COMMON USER FETCHING
@@ -94,7 +95,6 @@ class GetReportService
 
         return collect([]);
     }
-
 
     // ----------------------------------------------------------------
     //                  METRIC METHODS

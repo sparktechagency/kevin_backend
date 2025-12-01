@@ -13,6 +13,7 @@ use App\Service\Dream\ReflectionServic;
 use App\Service\Dream\SmartSuggestionService;
 use App\Service\Dream\StoreService;
 use App\Service\Dream\UpcommingService;
+use App\Service\Dream\UpdateGoalService;
 use App\Service\Dream\ViewService;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,7 @@ class DreamController extends Controller
     protected $reflectionServic;
     protected $aiFeedbackService;
     protected $smartSuggestionService;
+    protected $udpateGoalService;
     public function __construct(
         IndexService $indexService,
         StoreService $storeService,
@@ -40,6 +42,7 @@ class DreamController extends Controller
         ReflectionServic $reflectionServic,
         AiFeedbackService $aiFeedbackService,
         SmartSuggestionService $smartSuggestionService,
+        UpdateGoalService $updateGoalService,
     ){
         $this->indexService = $indexService;
         $this->storeService = $storeService;
@@ -51,6 +54,7 @@ class DreamController extends Controller
         $this->reflectionServic = $reflectionServic;
         $this->aiFeedbackService = $aiFeedbackService;
         $this->smartSuggestionService = $smartSuggestionService;
+        $this->udpateGoalService = $updateGoalService;
     }
     public function index(Request $request)
     {
@@ -63,6 +67,12 @@ class DreamController extends Controller
         return $this->execute(function()use($createRequest) {
              $data = $createRequest->validated();
             return $this->storeService->store($data);
+        });
+    }
+    public function updateGoal(Request $request,$dream_id)
+    {
+        return $this->execute(function()use($request,$dream_id) {
+            return $this->udpateGoalService->updateGoal($$request,$dream_id);
         });
     }
     public function view($id)

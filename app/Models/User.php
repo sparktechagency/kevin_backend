@@ -76,5 +76,10 @@ class User extends Authenticatable
     {
         return $this->device_token;
     }
+    public function dreams()
+    {
+        return $this->hasMany(Dream::class, 'user_id');
+    }
+
 
 }

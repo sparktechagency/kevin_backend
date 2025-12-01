@@ -41,4 +41,5 @@ class Dream extends Model
     {
         return $this->hasMany(Dream::class, 'user_id'); // make sure foreign key is correct
     }
+
 }

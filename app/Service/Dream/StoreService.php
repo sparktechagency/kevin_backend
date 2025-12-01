@@ -44,9 +44,8 @@ class StoreService
 
         // Check if submitted frequency is allowed
         if (!isset($data['frequency']) || !in_array($data['frequency'], $allowedFrequencies)) {
-            return $this->errorResponse("You are not allowed to create {$data['frequency']} for your plan.");
+            return $this->errorResponse("Kindly Upgrade your plan.");
         }
-
         // Count existing dreams in current month for Plan 1 & 2 if needed
         if ($subscription->plan->id == 1 || $subscription->plan->id == 2) {
             $currentMonthDreams = Dream::where('user_id', $user->id)

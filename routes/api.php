@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DreamController;
+use App\Http\Controllers\Api\ManagerDashboardController;
 use App\Http\Controllers\Api\ManageUserController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OpenAIContoller;
@@ -70,6 +71,7 @@ Route::prefix('dream')->group(function () {
         Route::middleware(['auth:sanctum', 'user'])->group(function () {
             Route::get('index', 'index');
             Route::post('store', 'store');
+            Route::put('update-goal/{dream_id}', 'updateGoal');
             Route::get('view/{id}', 'view');
             Route::post('check-in/{id}', 'checkIn');
             Route::get('upcoming', 'upcoming');
@@ -164,6 +166,17 @@ Route::prefix('term-condition')->group(function () {
     });
 });
 //Manager
+Route::prefix('manager')->group(function () {
+    Route::group(['controller' => ManagerDashboardController::class], function () {
+        Route::middleware(['auth:sanctum', 'manager'])->group(function () {
+            Route::get('dashboard', 'dashboard');
+            Route::get('member-details/{id}', 'memberDetails');
+            Route::post('goal-generate', 'goalGenerate');
+            Route::get('dream-mentor', 'dreamMember');
+            Route::get('analytics', 'analytics');
+        });
+    });
+});
 Route::prefix('department')->group(function () {
     Route::group(['controller' => DepartmentController::class], function () {
         Route::middleware(['auth:sanctum', 'manager'])->group(function () {
