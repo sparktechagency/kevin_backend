@@ -13,6 +13,7 @@ use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Http\Requests\Auth\EmployeeLoginRequest;
 use App\Service\Auth\CheckTokenService;
 use App\Service\Auth\CreatePasswordService;
+use App\Service\Auth\DeleteService;
 use App\Service\Auth\EmployeeLoginService;
 use App\Service\Auth\LoginService;
 use App\Service\Auth\LogoutService;
@@ -37,6 +38,7 @@ class AuthController extends Controller
     protected $checkTokenService;
     protected $employeeLoginService;
     protected $createPasswordService;
+    protected $deleteService;
    public function __construct(
         RegisterService $registerService,
         LoginService $loginService,
@@ -49,6 +51,7 @@ class AuthController extends Controller
         CheckTokenService $checkTokenService,
         EmployeeLoginService $employeeLoginService,
         CreatePasswordService $createPasswordService,
+        DeleteService $deleteService
     )
     {
         $this->registerService = $registerService;
@@ -62,6 +65,7 @@ class AuthController extends Controller
         $this->checkTokenService = $checkTokenService;
         $this->employeeLoginService = $employeeLoginService;
         $this->createPasswordService = $createPasswordService;
+        $this->deleteService = $deleteService;
     }
     public function register(RegisterRequest $register)
     {
@@ -136,4 +140,11 @@ class AuthController extends Controller
             return $this->logoutService->logout();
         });
     }
+    public function delete()
+    {
+        return $this->execute(function(){
+            return $this->deleteService->delete();
+        });
+    }
+
 }

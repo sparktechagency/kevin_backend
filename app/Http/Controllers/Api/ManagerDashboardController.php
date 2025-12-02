@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GoalGererate\GoalReqeust;
-use App\Service\AdminDashboard\AnalyticsService;
+use App\Service\ManagerDashboard\AnalyticsService;
 use App\Service\ManagerDashboard\DashbaordService;
 use App\Service\ManagerDashboard\DreamMemberService;
 use App\Service\ManagerDashboard\GoalGenerateService;
@@ -61,6 +61,12 @@ class ManagerDashboardController extends Controller
     {
         return $this->execute(function()use($request){
             return $this->dreamMemberService->dreamMember($request);
+        });
+    }
+     public function analytics(Request $request)
+    {
+        return $this->execute(function()use($request){
+            return $this->analyticsService->analytics($request);
         });
     }
 }

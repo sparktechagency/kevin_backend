@@ -105,7 +105,7 @@ class IndexService
             }
         ])
         ->orderByDesc('completed_count')
-        ->take(5)
+        ->take(12)
         ->get()
         ->map(fn($item) => [
             'category_name' => $item->name,

@@ -31,6 +31,7 @@ Route::prefix('auth')->group(function () {
             Route::put('create-password', 'createPassword');
             Route::post('check-token','checkToken');
             Route::post('logout','logout');
+            Route::post('delete','delete');
         });
     });
 });
