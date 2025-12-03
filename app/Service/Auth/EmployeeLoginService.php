@@ -12,7 +12,7 @@ class EmployeeLoginService
    {
         $user = User::where('employee_pin', $data->pin)->first();
         if (!$user) {
-            return $this->errorResponse('Employee PIN is not correct.');
+            return $this->errorResponse('User PIN is not correct.');
         }
         $token = $user->createToken('auth_token')->plainTextToken;
         return $this->successResponse([

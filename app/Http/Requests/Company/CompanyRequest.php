@@ -29,7 +29,7 @@ class CompanyRequest extends FormRequest
             'manager_phone'      => 'required|string|max:15',
 
             // Auto-generated code must be unique
-            'manager_code'       => 'nullable|string|unique:companies,manager_code',
+            'manager_code'       => 'nullable|string|unique:users,manager_code',
 
             'send_welcome_email' => 'nullable|boolean',
         ];

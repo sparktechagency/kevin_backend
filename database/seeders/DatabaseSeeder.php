@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Manager',
                 'email' => 'manager@gmail.com',
-                'password' => Hash::make('12345678'),
+                'employee_pin' => '000000',
                 'email_verified_at'=>now(),
                 'contact_number' => '01710000002',
                 'avatar' => 'default/profile.png',
@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'User',
                 'email' => 'user@gamil.com',
-                'password' => Hash::make('12345678'),
+                'employee_pin' => '000001',
                 'email_verified_at'=>now(),
                 'contact_number' => '01710000003',
                 'avatar' => 'default/profile.png',
@@ -49,7 +49,6 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Employee',
                 'email' => 'employee@gmail.com',
-                // 'password' => Hash::make('12345678'),
                 'employee_pin' => '123456',
                 'contact_number' => '01710000004',
                 'avatar' => 'default/profile.png',
@@ -59,8 +58,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Mentor',
                 'email' => 'mentor@gmail.com',
-                // 'password' => Hash::make('12345678'),
-                'employee_pin' => '123123',
+                'employee_pin' => '111111',
                 'contact_number' => '01710000005',
                 'avatar' => 'default/profile.png',
                 'role' => 'MENTOR',
