@@ -27,11 +27,8 @@ class CreateRequest extends FormRequest
             'description'   => 'nullable|string|max:1000',
             'frequency'     => 'required|in:Daily,Weekly,Monthly,Yearly,Quarterly',
 
-            'start_date'    => 'nullable|date|after_or_equal:today',
+            'start_date'    => 'nullable|date',
             'end_date'      => 'nullable|date|after_or_equal:start_date',
-
-            'from'          => 'nullable|date_format:H:i',
-            'to'            => 'nullable|date_format:H:i|after:from',
 
             'per_week'      => 'nullable|integer|min:1',
             'per_month'     => 'nullable|integer|min:1',
@@ -69,9 +66,6 @@ class CreateRequest extends FormRequest
             'end_date.date'                 => 'The end date must be a valid date.',
             'end_date.after_or_equal'       => 'The end date must be after the start date.',
 
-            'from.date_format'      => 'The "from" time must be in the format HH:MM.',
-            'to.date_format'        => 'The "to" time must be in the format HH:MM.',
-            'to.after'              => 'The "to" time must be after the "from" time.',
 
             'per_week.integer'      => 'The per week value must be an integer.',
             'per_week.min'          => 'The per week value must be at least 1.',

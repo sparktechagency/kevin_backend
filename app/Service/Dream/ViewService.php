@@ -113,8 +113,6 @@ class ViewService
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $endDate->format('Y-m-d'),
             'frequency' => $dream->frequency,
-            'from' => $dream->from,
-            'to' => $dream->to,
             'goal' => json_decode($dream->goal),
             'category' => $dream->category,
             'activity_status' => $activityStatus,

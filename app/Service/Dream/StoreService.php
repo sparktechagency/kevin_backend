@@ -55,7 +55,7 @@ class StoreService
 
             // Limit Plan 1 & 2 users to max 3 dreams per month
             if ($currentMonthDreams >= 3) {
-                return $this->errorResponse("You are on the {$subscription->plan->name} plan. Maximum 3 dreams per month allowed.");
+                return $this->errorResponse("You are on the {$subscription->plan->name} plan. Maximum 3 dreams allowed.");
             }
         }
 

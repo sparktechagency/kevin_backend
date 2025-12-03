@@ -12,7 +12,7 @@ class IndexService
     {
         $query = Category::query();
         $categories = $query->orderBy('created_at', 'desc')
-                        ->paginate($request->per_page ?? 10);
+                        ->paginate($request->per_page ?? 20 );
         return $this->successResponse($categories, 'Categories fetched successfully.');
     }
 }

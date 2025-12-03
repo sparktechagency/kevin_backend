@@ -14,8 +14,6 @@ class Dream extends Model
         'frequency',
         'start_date',
         'end_date',
-        'from',
-        'to',
         'per_week',
         'per_month',
         'status',

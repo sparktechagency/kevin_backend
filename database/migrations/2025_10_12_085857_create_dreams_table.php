@@ -20,8 +20,6 @@ return new class extends Migration
             $table->enum('frequency', ['Daily', 'Weekly', 'Monthly','Yearly','Quarterly']);
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->time('from')->nullable();
-            $table->time('to')->nullable();
             $table->integer('per_week')->nullable();
             $table->integer('per_month')->nullable();
             $table->integer('per_year')->nullable();

@@ -104,8 +104,6 @@ class ProgressService
                 'user' => $dream->user,
                 'status' => $dream->status,
                 'frequency' => $dream->frequency,
-                'from' => $dream->from,
-                'to' => $dream->to,
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
                 'activity_status' => $activityStatus,

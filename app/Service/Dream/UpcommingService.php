@@ -120,8 +120,6 @@ class UpcommingService
                 'start_date' => $dream->start_date,
                 'end_date' => $endDate->format('Y-m-d'),
                 'frequency' => $dream->frequency,
-                'from' => $dream->from,
-                'to' => $dream->to,
                 'activity_status' => $activityStatus,
                 'status' => $dream->status,
                 'category' => $dream->category,
