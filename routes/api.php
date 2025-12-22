@@ -60,7 +60,8 @@ Route::prefix('subscription')->group(function () {
          Route::middleware(['auth:sanctum', 'user'])->group(function () {
             Route::get('plans','plans')->name('plans');
             Route::get('checkout/{plan}', 'checkout');
-            Route::get('payment-intent/{plan}', 'paymentIntent');
+            // Route::get('payment-intent/{plan}', 'paymentIntent');
+            Route::post('apple-verify','verify');
             Route::get('success/{plan}', 'success');
             Route::post('cancel/{plan}', 'cancelSubscription');
             Route::post('resume/{plan}', 'resumeSubscription');

@@ -18,7 +18,6 @@ class SuccessService
     public function success($request, $planId)
     {
         try {
-
             $plan = Plan::find($planId);
             if (!$plan) {
                 return $this->errorResponse("Plan not found.");
