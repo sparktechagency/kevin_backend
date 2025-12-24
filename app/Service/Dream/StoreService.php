@@ -41,12 +41,10 @@ class StoreService
             // Plan 3 (Master) → all frequencies
             $allowedFrequencies = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
         }
-
-        // Check if submitted frequency is allowed
         if (!isset($data['frequency']) || !in_array($data['frequency'], $allowedFrequencies)) {
-            return $this->errorResponse("Kindly Upgrade your plan.");
+           return $this->errorResponse('You have no access ' . $data['frequency']);
+
         }
-        // Count existing dreams in current month for Plan 1 & 2 if needed
         if ($subscription->plan->id == 1 || $subscription->plan->id == 2) {
             $currentMonthDreams = Dream::where('user_id', $user->id)
                 ->whereYear('created_at', Carbon::now()->year)
