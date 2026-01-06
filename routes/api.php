@@ -170,7 +170,7 @@ Route::prefix('term-condition')->group(function () {
 });
 Route::prefix('privacy-policy')->group(function () {
     Route::group(['controller' => PrivacyPolicyController::class], function () {
-        Route::get('index', 'index')->middleware(['auth:sanctum', 'user']);
+        Route::get('index', 'index');
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
             Route::post('store', 'store');
         });
