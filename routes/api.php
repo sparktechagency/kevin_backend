@@ -151,7 +151,7 @@ Route::prefix('company')->group(function () {
 });
 Route::prefix('category')->group(function () {
     Route::group(['controller' => CategoryController::class], function () {
-        Route::get('index', 'index')->middleware(['auth:sanctum', 'user']);
+        Route::get('index', 'index');
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
             Route::post('store', 'store');
             Route::put('update/{id}', 'update');
