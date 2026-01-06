@@ -100,7 +100,4 @@ class CheckoutService
 
         return $this->successResponse($subscription, $message);
     }
-
-
-
 }
