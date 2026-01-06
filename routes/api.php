@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ManageUserController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OpenAIContoller;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TermConditionController;
 use App\Http\Controllers\Api\UserController;
@@ -161,6 +162,14 @@ Route::prefix('category')->group(function () {
 });
 Route::prefix('term-condition')->group(function () {
     Route::group(['controller' => TermConditionController::class], function () {
+        Route::get('index', 'index')->middleware(['auth:sanctum', 'user']);
+        Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+            Route::post('store', 'store');
+        });
+    });
+});
+Route::prefix('privacy-policy')->group(function () {
+    Route::group(['controller' => PrivacyPolicyController::class], function () {
         Route::get('index', 'index')->middleware(['auth:sanctum', 'user']);
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
             Route::post('store', 'store');
