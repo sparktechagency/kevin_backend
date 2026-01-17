@@ -12,14 +12,12 @@ use Illuminate\Support\Facades\Mail;
 class StoreService
 {
    use ResponseHelper;
-
    public function store($data)
     {
         if (isset($data['company_logo'])) {
             $logoPath = $data['company_logo']->store('company_logos', 'public');
             $data['company_logo'] = 'storage/' . $logoPath;
         }
-        // return $data['password'];
         $company = Company::create([
             'company_name'=>$data['company_name'],
             'company_email'=>$data['company_email'],
@@ -37,14 +35,13 @@ class StoreService
                 'email' =>$data['manager_email'],
                 'contact_number' =>$data['manager_phone'],
                 'password' =>Hash::make($data['password']),
-                'email_verified_at'=> now(),
+                'email_verified_at'=>now(),
                 'role' =>'MANAGER',
             ]);
         }
         if (!empty($data['send_welcome_email']) && $data['send_welcome_email'] == true) {
             Mail::to($company->company_email)->queue(new WelcomeEmail($company));
         }
-
         return $this->successResponse($company, 'Company created successfully.');
     }
 }
