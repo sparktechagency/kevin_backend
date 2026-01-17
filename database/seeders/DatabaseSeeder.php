@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Manager',
                 'email' => 'manager@gmail.com',
-                'employee_pin' => '000000',
+                'password' => Hash::make('12345678'),
                 'email_verified_at'=>now(),
                 'contact_number' => '01710000002',
                 'avatar' => 'default/profile.png',

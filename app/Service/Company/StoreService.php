@@ -6,6 +6,7 @@ use App\Mail\WelcomeEmail;
 use App\Models\Company;
 use App\Models\User;
 use App\Traits\ResponseHelper;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class StoreService
@@ -24,14 +25,15 @@ class StoreService
                 'name' =>$data['manager_full_name'],
                 'email' =>$data['manager_email'],
                 'contact_number' =>$data['manager_phone'],
-                'employee_pin' =>$data['manager_code'],
+                'password' =>Hash::make($data['password']),
+                'email_verified_at'=> now(),
                 'role' =>'MANAGER',
             ]);
         }
         if (!empty($data['send_welcome_email']) && $data['send_welcome_email'] == true) {
             Mail::to($company->company_email)->queue(new WelcomeEmail($company));
         }
-        
+
         return $this->successResponse($company, 'Company created successfully.');
     }
 }

@@ -41,7 +41,7 @@ class CompanyController extends Controller
     public function store(CompanyRequest $companyRequest)
     {
         return $this->execute(function()use($companyRequest) {
-            $data = $companyRequest->validated();
+             $data = $companyRequest->validated();
             return $this->storeService->store($data);
         });
     }
@@ -49,7 +49,7 @@ class CompanyController extends Controller
     public function update(UpdateCompanyRequest $companyRequest, $id)
     {
         return $this->execute(function() use ($companyRequest, $id) {
-             $data = $companyRequest->validated();
+               $data = $companyRequest->validated();
             return $this->updateService->update($data, $id);
         });
     }
