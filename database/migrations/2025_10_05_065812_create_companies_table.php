@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('manager_full_name');
             $table->string('manager_email')->unique();
             $table->string('manager_phone');
-            $table->string('manager_code')->unique()->nullable(); // auto generated
+            $table->string('manager_code');
             $table->boolean('send_welcome_email')->default(true);
             $table->timestamps();
         });

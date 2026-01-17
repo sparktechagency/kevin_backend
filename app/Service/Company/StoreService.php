@@ -19,7 +19,18 @@ class StoreService
             $logoPath = $data['company_logo']->store('company_logos', 'public');
             $data['company_logo'] = 'storage/' . $logoPath;
         }
-        $company = Company::create($data);
+        // return $data['password'];
+        $company = Company::create([
+            'company_name'=>$data['company_name'],
+            'company_email'=>$data['company_email'],
+            'company_phone'=>$data['company_phone'],
+            'company_address'=>$data['company_address'],
+            'manager_full_name'=>$data['manager_full_name'],
+            'manager_email'=>$data['manager_email'],
+            'manager_phone'=>$data['manager_phone'],
+            'send_welcome_email'=>$data['send_welcome_email'],
+            'manager_code'=>$data['password'],
+        ]);
         if($company){
             User::create([
                 'name' =>$data['manager_full_name'],
