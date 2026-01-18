@@ -123,7 +123,7 @@ Route::prefix('notification')->group(function () {
         });
     });
 });
-//admin
+
 Route::prefix('admin-dashboard')->group(function () {
     Route::group(['controller' => AdminDashboardController::class], function () {
         Route::middleware(['auth:sanctum', 'admin'])->group(function () {
