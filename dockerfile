@@ -30,7 +30,9 @@ RUN docker-php-ext-configure gd --with-jpeg \
     bcmath \
     gd \
     intl \
-    ffi
+    ffi\
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 #Copy Custom Config & Composer
 COPY php/custom.ini /usr/local/etc/php/conf.d/custom.ini
