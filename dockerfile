@@ -18,9 +18,13 @@ RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     libffi-dev \
-    icu-dev
+    icu-dev \
+    autoconf \
+    make \
+    g++ \
+    linux-headers
 
-# Install PHP extensions
+# 2. Install PHP Extensions & Redis
 RUN docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
@@ -30,7 +34,7 @@ RUN docker-php-ext-configure gd --with-jpeg \
     bcmath \
     gd \
     intl \
-    ffi\
+    ffi \
     && pecl install redis \
     && docker-php-ext-enable redis
 
